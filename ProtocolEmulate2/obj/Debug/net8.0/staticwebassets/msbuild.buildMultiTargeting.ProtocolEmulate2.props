@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/ProtocolEmulate2.props" />
+</Project>

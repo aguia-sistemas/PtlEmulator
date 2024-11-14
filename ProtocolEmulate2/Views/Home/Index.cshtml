@@ -1,0 +1,124 @@
+﻿@model Dictionary<int, Dictionary<int, ProtocolEmulate.Models.DisplayWidget>>
+
+<h1>PTL Emulator</h1>
+
+<div id="clients-container">
+    @foreach (var client in Model)
+    {
+        <div>
+            <h2>Client @client.Key</h2>
+            <div style="display: flex; flex-wrap: wrap;">
+                @foreach (var display in client.Value)
+                {
+                    <div style="margin: 10px;">
+                        <div class="display-widget">
+                            <button class="confirm" style="background-color: @display.Value.ButtonConfirm.Color">@display.Value.ButtonConfirm.Label</button>
+                            <button class="plus">+</button>
+                            <button class="minus">-</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function updateDisplayData() {
+            fetch('/Home/GetDisplayData')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('clients-container');
+                    container.innerHTML = '';
+                    for (const clientId in data) {
+                        const clientDiv = document.createElement('div');
+                        const clientHeader = document.createElement('h2');
+                        clientHeader.textContent = `Client ${clientId}`;
+                        clientDiv.appendChild(clientHeader);
+
+                        const displayContainer = document.createElement('div');
+                        displayContainer.style.display = 'flex';
+                        displayContainer.style.flexWrap = 'wrap';
+
+                        for (const displayId in data[clientId]) {
+                            const displayWidget = data[clientId][displayId];
+                            const displayDiv = document.createElement('div');
+                            displayDiv.style.margin = '10px';
+
+                            const widgetDiv = document.createElement('div');
+                            widgetDiv.className = 'display-widget';
+
+                            const confirmButton = document.createElement('button');
+                            confirmButton.className = 'confirm';
+                            confirmButton.style.backgroundColor = displayWidget.buttonConfirm.color;
+                            confirmButton.textContent = displayWidget.buttonConfirm.label;
+                            confirmButton.value = displayWidget.buttonConfirm.label;
+                            confirmButton.setAttribute('data-client-id', clientId);
+                            confirmButton.setAttribute('data-display-id', displayId);
+                            confirmButton.onclick = () => sendConfirm(clientId, displayId, confirmButton.value);
+
+                            const plusButton = document.createElement('button');
+                            plusButton.className = 'plus';
+                            plusButton.textContent = '+';
+                            plusButton.onclick = () => increaseValue(clientId, displayId);
+
+                            const minusButton = document.createElement('button');
+                            minusButton.className = 'minus';
+                            minusButton.textContent = '-';
+                            minusButton.onclick = () => decreaseValue(clientId, displayId);
+
+                            widgetDiv.appendChild(confirmButton);
+                            widgetDiv.appendChild(plusButton);
+                            widgetDiv.appendChild(minusButton);
+                            displayDiv.appendChild(widgetDiv);
+                            displayContainer.appendChild(displayDiv);
+                        }
+
+                        clientDiv.appendChild(displayContainer);
+                        container.appendChild(clientDiv);
+                    }
+                })
+                .catch(error => console.error('Error fetching display data:', error));
+        }
+
+        function sendConfirm(clientId, displayId, value) {
+            value = value.trim(); // Remove espaços em branco
+            console.log('Sending confirm:', clientId, displayId, value);
+            fetch('/Home/SendConfirm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ clientId, displayId, value })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Confirm sent:', data);
+                })
+                .catch(error => console.error('Error sending confirm:', error));
+        }
+
+        function increaseValue(clientId, displayId) {
+            const confirmButton = document.querySelector(`button.confirm[data-client-id="${clientId}"][data-display-id="${displayId}"]`);
+            let value = parseInt(confirmButton.value, 10);
+            if (!isNaN(value)) {
+                value++;
+                confirmButton.value = value;
+                confirmButton.textContent = value;
+            }
+}
+
+        function decreaseValue(clientId, displayId) {
+            const confirmButton = document.querySelector(`button.confirm[data-client-id="${clientId}"][data-display-id="${displayId}"]`);
+            let value = parseInt(confirmButton.value, 10);
+            if (!isNaN(value)) {
+                value--;
+                confirmButton.value = value;
+                confirmButton.textContent = value;
+            }
+}
+
+        setInterval(updateDisplayData, 2000);
+    </script>
+}
