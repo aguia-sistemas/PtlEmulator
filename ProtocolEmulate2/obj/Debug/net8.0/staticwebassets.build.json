@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "6dKn/sTKenUtyPmKWz8TNwpuLO8ZWhtl2XYFsEoy/2U=",
+  "Hash": "LPj+ZxGt3RsHSFrYAdAI/Npi/lSBnOwBthYcRjMKdKw=",
   "Source": "ProtocolEmulate2",
   "BasePath": "_content/ProtocolEmulate2",
   "Mode": "Default",
@@ -91,6 +91,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/favicon.ico"
+    },
+    {
+      "Identity": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/wwwroot/Icons/barcode-read.gif",
+      "SourceId": "ProtocolEmulate2",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/wwwroot/",
+      "BasePath": "_content/ProtocolEmulate2",
+      "RelativePath": "Icons/barcode-read.gif",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/Icons/barcode-read.gif"
     },
     {
       "Identity": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/wwwroot/js/site.js",

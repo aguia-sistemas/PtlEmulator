@@ -1,20 +1,41 @@
 ﻿@model Dictionary<int, Dictionary<int, ProtocolEmulate.Models.DisplayWidget>>
 
-<h1>PTL Emulator</h1>
+<h1 class="text-center my-4">PTL Emulator</h1>
 
-<div id="clients-container">
+
+<div id="scanner-container" class="container mb-4">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <img src="~/Icons/barcode-read.gif" alt="Barcode Scanner" class="img-fluid" />
+        </div>
+        <div class="col-auto">
+            <input type="text" id="scanner-input" name="scanner-input" class="form-control" />
+        </div>
+        <div class="col-auto">
+            <button id="scanner-button" class="btn btn-primary">
+                Leitura P01
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="clients-container" class="container">
     @foreach (var client in Model)
     {
-        <div>
-            <h2>Client @client.Key</h2>
-            <div style="display: flex; flex-wrap: wrap; width: 100%;">
+        <div class="mb-4">
+            <h2>Controlador @client.Key</h2>
+            <div class="row">
                 @foreach (var display in client.Value)
                 {
-                    <div class="display-widget">
-                        <button class="confirm" style="background-color: @display.Value.ButtonConfirm.Color">@display.Value.ButtonConfirm.Label</button>
-                        <div class="button-container">
-                            <button class="plus">+</button>
-                            <button class="minus">-</button>
+                    <div class="col-3 col-md-2 col-lg-1 mb-3">
+                        <div class="display-widget p-3 border rounded bg-light">
+                            <button class="confirm btn btn-secondary w-100 mb-2" style="background-color: @display.Value.ButtonConfirm.Color">
+                                @display.Value.ButtonConfirm.Label
+                            </button>
+                            <div class="button-container d-flex justify-content-between">
+                                <button class="plus btn btn-primary">+</button>
+                                <button class="minus btn btn-primary">-</button>
+                            </div>
                         </div>
                     </div>
                 }
@@ -38,17 +59,18 @@
                         clientDiv.appendChild(clientHeader);
 
                         const displayContainer = document.createElement('div');
-                        displayContainer.style.display = 'flex';
-                        displayContainer.style.flexWrap = 'wrap';
-                        displayContainer.style.width = '100%';
+                        displayContainer.className = 'row';
 
                         for (const displayId in data[clientId]) {
                             const displayWidget = data[clientId][displayId];
                             const displayDiv = document.createElement('div');
-                            displayDiv.className = 'display-widget';
+                            displayDiv.className = 'col-3 col-md-2 col-lg-1 mb-3';
+
+                            const widgetDiv = document.createElement('div');
+                            widgetDiv.className = 'display-widget p-3 border rounded bg-light';
 
                             const confirmButton = document.createElement('button');
-                            confirmButton.className = 'confirm';
+                            confirmButton.className = 'confirm btn btn-secondary w-100 mb-2';
                             confirmButton.style.backgroundColor = displayWidget.buttonConfirm.color;
                             confirmButton.textContent = displayWidget.buttonConfirm.label;
                             confirmButton.value = displayWidget.buttonConfirm.label;
@@ -57,23 +79,24 @@
                             confirmButton.onclick = () => sendConfirm(clientId, displayId, confirmButton.value);
 
                             const buttonContainer = document.createElement('div');
-                            buttonContainer.className = 'button-container';
+                            buttonContainer.className = 'button-container d-flex justify-content-between';
 
                             const plusButton = document.createElement('button');
-                            plusButton.className = 'plus';
+                            plusButton.className = 'plus btn btn-primary btn-sm';
                             plusButton.textContent = '+';
                             plusButton.onclick = () => increaseValue(clientId, displayId);
 
                             const minusButton = document.createElement('button');
-                            minusButton.className = 'minus';
+                            minusButton.className = 'minus btn btn-primary btn-sm';
                             minusButton.textContent = '-';
                             minusButton.onclick = () => decreaseValue(clientId, displayId);
 
                             buttonContainer.appendChild(plusButton);
                             buttonContainer.appendChild(minusButton);
 
-                            displayDiv.appendChild(confirmButton);
-                            displayDiv.appendChild(buttonContainer);
+                            widgetDiv.appendChild(confirmButton);
+                            widgetDiv.appendChild(buttonContainer);
+                            displayDiv.appendChild(widgetDiv);
                             displayContainer.appendChild(displayDiv);
                         }
 
@@ -121,65 +144,55 @@
             }
         }
 
+        document.getElementById('scanner-button').addEventListener('click', function() {
+            const scannerInput = document.getElementById('scanner-input').value;
+
+            fetch('/Home/ProcessScanner', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ scannerValue: scannerInput })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Scanner data sent:', data);
+                })
+                .catch(error => console.error('Error sending scanner data:', error));
+        });
+
         setInterval(updateDisplayData, 2000);
     </script>
 }
 
 <style>
-    #clients-container {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
+    #scanner-container img {
+        width: 40px;
+        height: auto;
     }
 
     .display-widget {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        border: 1px solid #ccc;
-        padding: 5px; /* Reduzido de 10px para 5px */
-        border-radius: 5px;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin: 5px;
-        flex: 1 0 8%; /* Ajuste a largura para 12 displays por linha */
-        box-sizing: border-box;
     }
 
     .display-widget button {
-        width: 40px; /* Reduzido de 60px para 40px */
-        height: 40px; /* Reduzido de 60px para 40px */
-        margin: 5px;
-        font-size: 1em; /* Reduzido de 1.2em para 1em */
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
+        width: 100%;
     }
 
-    .display-widget button.confirm {
-        background-color: #ddd;
-        color: #000;
+    .button-container button {
+        width: 40px;
+        height: 40px;
     }
 
-    .display-widget .button-container {
-        display: flex;
-        flex-direction: column;
-        margin-left: 10px;
-    }
-
-    .display-widget button.plus,
-    .display-widget button.minus {
-        width: 20px; /* Reduzido de 30px para 20px */
-        height: 20px; /* Reduzido de 30px para 20px */
-        background-color: #007bff;
-        color: #fff;
-        font-size: 0.8em; /* Reduzido de 1em para 0.8em */
+    .button-container button {
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        margin: 2px 0;
-    }
-
-    .display-widget button.plus:hover,
-    .display-widget button.minus:hover {
-        background-color: #0056b3;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

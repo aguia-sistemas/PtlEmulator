@@ -5,6 +5,10 @@
       "PackagePath": "staticwebassets/ProtocolEmulate2.bundle.scp.css"
     },
     {
+      "Id": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/wwwroot/Icons/barcode-read.gif",
+      "PackagePath": "staticwebassets/Icons/barcode-read.gif"
+    },
+    {
       "Id": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/wwwroot/css/site.css",
       "PackagePath": "staticwebassets/css/site.css"
     },

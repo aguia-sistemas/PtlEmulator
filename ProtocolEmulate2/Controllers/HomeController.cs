@@ -1,9 +1,10 @@
 // HomeController.cs
 using System.Diagnostics;
+using System.Net.Http.Headers;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using ProtocolEmulate2.Models;
 using ProtocolEmulate2.Services;
-using PtlEmulator.App.Command;
 
 namespace ProtocolEmulate2.Controllers
 {
@@ -34,6 +35,26 @@ namespace ProtocolEmulate2.Controllers
         {
             _displayService.SendMessageToClient(request.ClientId, "Confirm", request.DisplayId.ToString(), request.Value.ToString());
             return Json(new { success = true });
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> ProcessScanner([FromBody] ScannerRequest scannerRequest)
+        {
+            var client = new HttpClient();
+            var requestUri = $"http://localhost:15672/api/exchanges/%2f/{scannerRequest.ScannerEst}/publish";
+            var body = $"P01,{scannerRequest.ScannerEst},{scannerRequest.ScannerValue},{DateTime.Now:yyyy-MM-ddTHH:mm:ss.fff}";
+            var jsonContent = $"{{\"properties\":{{}},\"routing_key\":\"{scannerRequest.ScannerEst}\",\"payload\":\"{{\\\"body\\\":\\\"{body}\\\"}}\",\"payload_encoding\":\"string\"}}";
+            
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes("guest:guest")));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return null;
         }
     }
 }

@@ -1,8 +1,10 @@
 // DisplayService.cs
 
+using System.Text;
 using ProtocolEmulate.Models;
 using ProtocolEmulate2.Models;
 using PtlEmulator.App.Command;
+using RabbitMQ.Client;
 
 namespace ProtocolEmulate2.Services
 {
@@ -34,7 +36,7 @@ namespace ProtocolEmulate2.Services
                 }
             }
         }
-        
+
         public Action<BaseCommand> OnClientConnected(int clientId)
         {
             CreatePtlGrid(clientId);
