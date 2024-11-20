@@ -28,3 +28,4 @@
 /home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/ProtocolEmulate2.pdb
 /home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/ProtocolEmulate2.genruntimeconfig.cache
 /home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/ref/ProtocolEmulate2.dll
+/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/ProtocolEmulate2.sourcelink.json
