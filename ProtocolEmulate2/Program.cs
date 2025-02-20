@@ -8,8 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Adicione serviços ao contêiner.
 builder.Services.AddControllersWithViews();
 
-// Registre o BaseTcpListener como um serviço singleton
-builder.Services.AddSingleton<BaseTcpListener>(sp => new BaseTcpListener(4660));
+// Registre os BaseTcpListeners como serviços singletons
+Console.Write("Digite as portas que deseja usar (separadas por vírgula): ");
+var portsInput = Console.ReadLine();
+var ports = portsInput.Split(',').Select(p => int.Parse(p.Trim())).ToArray();
+
+foreach (var port in ports)
+{
+    builder.Services.AddSingleton<BaseTcpListener>(sp => new BaseTcpListener(port));
+}
 
 // Registre o HomeController como um serviço singleton
 builder.Services.AddSingleton<HomeController>();
@@ -37,16 +44,22 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-var listener = app.Services.GetRequiredService<BaseTcpListener>();
+var listeners = app.Services.GetServices<BaseTcpListener>();
 var displayService = app.Services.GetRequiredService<DisplayService>();
 
-listener.ClientConnectedEvent += displayService.OnClientConnected;
-displayService.SendMessageEvent += (clientId, messageType, device, value) =>
+var clienteId = 1;
+foreach (var listener in listeners)
 {
-    var client = listener.GetClient(clientId) as AtopClient;
-    client?.SendMessage(messageType, device, value);
-};
+    
+    listener.ClientConnectedEvent += displayService.OnClientConnected;
+    displayService.SendMessageEvent += (clientId, messageType, device, value) =>
+    {
+        var client = listener.GetClient(clientId) as AtopClient;
+        client?.SendMessage(messageType, device, value);
+    };
 
-listener.StartServer();
+    listener.StartServer(clienteId);
+    clienteId++;
+}
 
 app.Run();

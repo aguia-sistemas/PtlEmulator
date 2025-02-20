@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProtocolEmulate2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+744801dc92d7370e2dbea31ff439b58687b1bd2c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+805a93a4b945f6cc2bb9ccc481c10e43b523266d")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProtocolEmulate2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProtocolEmulate2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

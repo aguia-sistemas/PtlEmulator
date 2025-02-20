@@ -10,30 +10,32 @@ namespace ProtocolEmulate2.Services
 {
     public class DisplayService
     {
-        public Dictionary<int, Dictionary<int, DisplayWidget>> DisplayDictionary { get; private set; }
+        public List<ClientDisplay> ClientDisplays { get; private set; }
 
         public event Action<int, string, string, string>? SendMessageEvent;
 
         public DisplayService()
         {
-            DisplayDictionary = new Dictionary<int, Dictionary<int, DisplayWidget>>();
+            ClientDisplays = new List<ClientDisplay>();
         }
 
         public void CreatePtlGrid(int clientId)
         {
-            if (!DisplayDictionary.ContainsKey(clientId))
+            if (!ClientDisplays.Any(cd => cd.ClientId == clientId))
             {
-                DisplayDictionary.Add(clientId, new Dictionary<int, DisplayWidget>());
+                var clientDisplay = new ClientDisplay(clientId);
 
-                for (int i = 1; i < 121; i++)
+                for (int i = 1; i <= 120; i++)
                 {
                     var displayWidget = new DisplayWidget
                     {
-                        ConfirmLabel = "____",
-                        ButtonConfirm = new Button { Label = "____", Color = "blink" }
+                        ConfirmLabel = "_",
+                        ButtonConfirm = new Button { Label = "_", Color = "blink" }
                     };
-                    DisplayDictionary[clientId].Add(i, displayWidget);
+                    clientDisplay.DisplayWidgets.Add(displayWidget);
                 }
+
+                ClientDisplays.Add(clientDisplay);
             }
         }
 
@@ -45,7 +47,8 @@ namespace ProtocolEmulate2.Services
 
         private void OnReceiveCommand(BaseCommand command)
         {
-            var displayWidget = DisplayDictionary[command.ClientId][command.DisplayId];
+            var clientDisplay = ClientDisplays.First(cd => cd.ClientId == command.ClientId);
+            var displayWidget = clientDisplay.DisplayWidgets[command.DisplayId - 1];
 
             if (command is TurnOn turnOn)
             {
@@ -54,7 +57,7 @@ namespace ProtocolEmulate2.Services
 
             if (command is TurnOff)
             {
-                displayWidget.ButtonConfirm.Label = "____";
+                displayWidget.ButtonConfirm.Label = "_";
                 displayWidget.ButtonConfirm.Color = "";
             }
 

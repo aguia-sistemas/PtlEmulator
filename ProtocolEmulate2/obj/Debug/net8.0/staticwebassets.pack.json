@@ -2,7 +2,7 @@
   "Files": [
     {
       "Id": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/scopedcss/projectbundle/ProtocolEmulate2.bundle.scp.css",
-      "PackagePath": "staticwebassets/ProtocolEmulate2.bundle.scp.css"
+      "PackagePath": "staticwebassets/ProtocolEmulate2.8fripjt55e.bundle.scp.css"
     },
     {
       "Id": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/wwwroot/Icons/barcode-read.gif",
@@ -247,6 +247,10 @@
     {
       "Id": "/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/wwwroot/lib/jquery/dist/jquery.min.map",
       "PackagePath": "staticwebassets/lib/jquery/dist/jquery.min.map"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ProtocolEmulate2.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ProtocolEmulate2.Microsoft.AspNetCore.StaticWebAssets.props",

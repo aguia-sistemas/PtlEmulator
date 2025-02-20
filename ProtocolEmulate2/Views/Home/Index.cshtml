@@ -1,47 +1,70 @@
-﻿@model Dictionary<int, Dictionary<int, ProtocolEmulate.Models.DisplayWidget>>
+﻿@model List<ProtocolEmulate2.Models.ClientDisplay>
 
-<h1 class="text-center my-4">PTL Emulator</h1>
+<h1 class="text-center my-12">PTL Emulator</h1>
 
-
-<div id="scanner-container" class="container mb-4">
+<div id="scanner-container" class="mb-4">
     <div class="row align-items-center">
         <div class="col-auto">
-            <img src="~/Icons/barcode-read.gif" alt="Barcode Scanner" class="img-fluid" />
+            <select id="protocol-select" class="form-select">
+                <option value="P01">P01</option>
+                <option value="W01">W01</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <select id="scanner-est-select" class="form-select">
+                <option value="PTW">PTW</option>
+                <option value="PTW2">PTW2</option>
+                <option value="EST1">EST1</option>
+                <option value="EST2">EST2</option>
+            </select>
         </div>
         <div class="col-auto">
             <input type="text" id="scanner-input" name="scanner-input" class="form-control" />
         </div>
         <div class="col-auto">
             <button id="scanner-button" class="btn btn-primary">
-                Leitura P01
+                Enviar
             </button>
+        </div>
+        <div class="col-auto">
+            <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="clients-container" class="container">
-    @foreach (var client in Model)
-    {
-        <div class="mb-4">
-            <h2>Controlador @client.Key</h2>
-            <div class="row">
-                @foreach (var display in client.Value)
-                {
-                    <div class="col-3 col-md-2 col-lg-1 mb-3">
-                        <div class="display-widget p-3 border rounded bg-light">
-                            <button class="confirm btn btn-secondary w-100 mb-2" style="background-color: @display.Value.ButtonConfirm.Color">
-                                @display.Value.ButtonConfirm.Label
-                            </button>
-                            <div class="button-container d-flex justify-content-between">
-                                <button class="plus btn btn-primary">+</button>
-                                <button class="minus btn btn-primary">-</button>
-                            </div>
+<div id="clients-container">
+    <div class="row">
+        @foreach (var client in Model)
+        {
+            <div class="col-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Controlador @client.ClientId</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var display in client.DisplayWidgets)
+                            {
+                                <div class="col-3 col-md-2 col-lg-1 mb-3">
+                                    <div class="display-widget p-3 border rounded bg-light">
+                                        <button class="confirm btn btn-secondary w-100 mb-2" style="background-color: @display.ButtonConfirm.Color">
+                                            @display.ButtonConfirm.Label
+                                        </button>
+                                        <div class="button-container d-flex justify-content-between">
+                                            <button class="plus btn btn-primary">+</button>
+                                            <button class="minus btn btn-primary">-</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
-                }
+                </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>
 
 @section Scripts {
@@ -51,18 +74,26 @@
                 .then(response => response.json())
                 .then(data => {
                     const container = document.getElementById('clients-container');
-                    container.innerHTML = '';
-                    for (const clientId in data) {
+                    container.innerHTML = '<div class="row"></div>';
+                    const row = container.querySelector('.row');
+                    data.forEach(client => {
                         const clientDiv = document.createElement('div');
+                        clientDiv.className = 'col-6 mb-4';
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = 'card';
+                        const cardHeader = document.createElement('div');
+                        cardHeader.className = 'card-header';
                         const clientHeader = document.createElement('h2');
-                        clientHeader.textContent = `Client ${clientId}`;
-                        clientDiv.appendChild(clientHeader);
+                        clientHeader.textContent = `Controlador ${client.clientId}`;
+                        cardHeader.appendChild(clientHeader);
+                        cardDiv.appendChild(cardHeader);
 
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body';
                         const displayContainer = document.createElement('div');
                         displayContainer.className = 'row';
 
-                        for (const displayId in data[clientId]) {
-                            const displayWidget = data[clientId][displayId];
+                        client.displayWidgets.forEach((displayWidget, displayId) => {
                             const displayDiv = document.createElement('div');
                             displayDiv.className = 'col-3 col-md-2 col-lg-1 mb-3';
 
@@ -74,9 +105,10 @@
                             confirmButton.style.backgroundColor = displayWidget.buttonConfirm.color;
                             confirmButton.textContent = displayWidget.buttonConfirm.label;
                             confirmButton.value = displayWidget.buttonConfirm.label;
-                            confirmButton.setAttribute('data-client-id', clientId);
-                            confirmButton.setAttribute('data-display-id', displayId);
-                            confirmButton.onclick = () => sendConfirm(clientId, displayId, confirmButton.value);
+                            confirmButton.setAttribute('data-client-id', client.clientId);
+                            confirmButton.setAttribute('data-display-id', displayId + 1); // Ajuste aqui
+
+                            confirmButton.onclick = () => sendConfirm(client.clientId, displayId + 1, confirmButton.value); // Ajuste aqui
 
                             const buttonContainer = document.createElement('div');
                             buttonContainer.className = 'button-container d-flex justify-content-between';
@@ -84,12 +116,12 @@
                             const plusButton = document.createElement('button');
                             plusButton.className = 'plus btn btn-primary btn-sm';
                             plusButton.textContent = '+';
-                            plusButton.onclick = () => increaseValue(clientId, displayId);
+                            plusButton.onclick = () => increaseValue(client.clientId, displayId + 1); // Ajuste aqui
 
                             const minusButton = document.createElement('button');
                             minusButton.className = 'minus btn btn-primary btn-sm';
                             minusButton.textContent = '-';
-                            minusButton.onclick = () => decreaseValue(clientId, displayId);
+                            minusButton.onclick = () => decreaseValue(client.clientId, displayId + 1); // Ajuste aqui
 
                             buttonContainer.appendChild(plusButton);
                             buttonContainer.appendChild(minusButton);
@@ -98,17 +130,19 @@
                             widgetDiv.appendChild(buttonContainer);
                             displayDiv.appendChild(widgetDiv);
                             displayContainer.appendChild(displayDiv);
-                        }
+                        });
 
-                        clientDiv.appendChild(displayContainer);
-                        container.appendChild(clientDiv);
-                    }
+                        cardBody.appendChild(displayContainer);
+                        cardDiv.appendChild(cardBody);
+                        clientDiv.appendChild(cardDiv);
+                        row.appendChild(clientDiv);
+                    });
                 })
                 .catch(error => console.error('Error fetching display data:', error));
         }
 
         function sendConfirm(clientId, displayId, value) {
-            value = value.trim(); // Remove espaços em branco
+            value = value.trim();
             console.log('Sending confirm:', clientId, displayId, value);
             fetch('/Home/SendConfirm', {
                 method: 'POST',
@@ -145,20 +179,29 @@
         }
 
         document.getElementById('scanner-button').addEventListener('click', function() {
+            const protocol = document.getElementById('protocol-select').value;
+            const scannerEst = document.getElementById('scanner-est-select').value;
             const scannerInput = document.getElementById('scanner-input').value;
+            const loader = document.getElementById('loader');
 
-            fetch('/Home/ProcessScanner', {
+            loader.style.display = 'inline-block';
+
+            fetch(`/Home/ProcessProtocol`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ scannerValue: scannerInput })
+                body: JSON.stringify({ protocol, scannerValue: scannerInput, scannerEst })
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Scanner data sent:', data);
+                    console.log('Data sent:', data);
+                    document.getElementById('scanner-input').value = '';
                 })
-                .catch(error => console.error('Error sending scanner data:', error));
+                .catch(error => console.error('Error sending data:', error))
+                .finally(() => {
+                    loader.style.display = 'none';
+                });
         });
 
         setInterval(updateDisplayData, 2000);
@@ -166,6 +209,11 @@
 }
 
 <style>
+    .spinner-border {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
     #scanner-container img {
         width: 40px;
         height: auto;
@@ -182,13 +230,13 @@
     }
 
     .button-container button {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 20px;
     }
 
     .button-container button {
-        width: 30px;
-        height: 30px;
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
         padding: 0;
         display: flex;

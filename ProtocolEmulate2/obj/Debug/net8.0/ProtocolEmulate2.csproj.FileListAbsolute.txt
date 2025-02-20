@@ -32,3 +32,6 @@
 /home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/ProtocolEmulate2.csproj.AssemblyReference.cache
 /home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/bin/Debug/net8.0/RabbitMQ.Client.dll
 /home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/Protocol.9B33DBF0.Up2Date
+/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/bin/Debug/net8.0/ProtocolEmulate2.staticwebassets.endpoints.json
+/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/staticwebassets.build.endpoints.json
+/home/leandro/RiderProjects/ProtocolEmulate2/ProtocolEmulate2/obj/Debug/net8.0/staticwebassets/msbuild.ProtocolEmulate2.Microsoft.AspNetCore.StaticWebAssetEndpoints.props

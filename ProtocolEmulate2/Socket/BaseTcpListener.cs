@@ -17,7 +17,7 @@ namespace PtlEmulator.App.Socket
         private readonly CancellationTokenSource _tokenSource;
         private bool _listen = true;
         private int _clientCounter = 0;
-        private readonly List<BaseTcpClient> _clientList;
+        private readonly ConcurrentDictionary<int, BaseTcpClient> _clientList;
 
         public event Func<int, Action<BaseCommand>>? ClientConnectedEvent;
 
@@ -26,16 +26,16 @@ namespace PtlEmulator.App.Socket
             _listener = new TcpListener(IPAddress.Any, port);
             this._taskFactory = new TaskFactory();
             this._tokenSource = new CancellationTokenSource();
-            this._clientList = new List<BaseTcpClient>();
+            this._clientList = new ConcurrentDictionary<int, BaseTcpClient>();
         }
 
-        public void StartServer()
+        public void StartServer(int clientId)
         {
             _listen = true;
-            _listenerTask = _taskFactory.StartNew(StartListner, _tokenSource.Token);
+            _listenerTask = _taskFactory.StartNew(() => StartListener(clientId), _tokenSource.Token);
         }
 
-        public async void StartListner()
+        public async void StartListener(int clientId)
         {
             _listener.Start();
 
@@ -43,11 +43,11 @@ namespace PtlEmulator.App.Socket
             {
                 if (_listener.Pending())
                 {
-                    var clientId = Interlocked.Increment(ref _clientCounter);
                     Debug.WriteLine($"Client connected {clientId}");
                     var client = new AtopClient(await _listener.AcceptTcpClientAsync(), clientId, _tokenSource, ClientConnectedEvent, _taskFactory);
-                    _clientList.Add(client);
-                    
+                    _clientList.TryAdd(clientId, client);
+
+                    // Chame o evento ClientConnectedEvent para cada cliente conectado
                     ClientConnectedEvent?.Invoke(clientId);
                 }
                 else
@@ -59,7 +59,8 @@ namespace PtlEmulator.App.Socket
 
         public AtopClient GetClient(int clientId)
         {
-            return _clientList.FirstOrDefault(c => c.ClientId == clientId) as AtopClient;
+            _clientList.TryGetValue(clientId, out var client);
+            return client as AtopClient;
         }
     }
 }
